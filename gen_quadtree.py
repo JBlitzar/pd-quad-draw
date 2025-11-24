@@ -17,8 +17,9 @@ def is_uniform(img, x, y, size, threshold):
 
 
 def draw_rect(x, y, size, color):
-    with open("out.txt", "a") as f:
-        f.write(f"{x};{y};{size};{tuple(color.tolist())}\n")
+    with open("pd-src/img.txt", "a") as f:
+        c = ",".join([str(i) for i in color.tolist()])
+        f.write(f"{x};{y};{size};{c}\n")
 
 
 def quadtree(img, x, y, size, threshold):
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     input_image_path = "image.png"
     threshold = 15
 
-    with open("out.txt", "w+") as f:
+    with open("pd-src/img.txt", "w+") as f:
         f.write("")
 
     img = Image.open(input_image_path).convert("RGB")
