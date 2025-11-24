@@ -16,26 +16,21 @@ def is_uniform(img, x, y, size, threshold):
     return np.all(diff <= threshold)
 
 
-def draw_rect(x, y, size, color):
-    with open("pd-src/img.txt", "a") as f:
-        c = ",".join([str(i) for i in color.tolist()])
-        f.write(f"{x};{y};{size};{c}\n")
-
-
 def quadtree(img, x, y, size, threshold):
     if is_uniform(img, x, y, size, threshold) or size == 1:
-        draw_rect(x, y, size, average_color(img, x, y, size))
+        return [(x, y, size, average_color(img, x, y, size))]
     else:
         half = size // 2
-        quadtree(img, x, y, half, threshold)  # NW
-        quadtree(img, x + half, y, half, threshold)  # NE
-        quadtree(img, x, y + half, half, threshold)  # SW
-        quadtree(img, x + half, y + half, half, threshold)  # SE
+        rects = []
+        rects.extend(quadtree(img, x, y, half, threshold))  # NW
+        rects.extend(quadtree(img, x + half, y, half, threshold))  # NE
+        rects.extend(quadtree(img, x, y + half, half, threshold))  # SW
+        rects.extend(quadtree(img, x + half, y + half, half, threshold))  # SE
+        return rects
 
 
 if __name__ == "__main__":
     input_image_path = "image.png"
-    threshold = 15
 
     with open("pd-src/img.txt", "w+") as f:
         f.write("")
@@ -43,6 +38,14 @@ if __name__ == "__main__":
     img = Image.open(input_image_path).convert("RGB")
     img_np = np.array(img)
     width, height = img.size
-    size = width
+    img_size = width
 
-    quadtree(img_np, 0, 0, size, threshold)
+    for threshold in range(200, 30, -10):
+        draw = quadtree(img_np, 0, 0, img_size, threshold)
+        draw = sorted(draw, key=lambda item: item[2], reverse=True)
+        with open("pd-src/img.txt", "a") as f:
+            for x, y, s, color in draw:
+                f.write(f"{x};{y};{s};{color[0]},{color[1]},{color[2]}\n")
+        print(f"Threshold {threshold} done, {len(draw)} rects")
+        # print(draw)
+        # print(img_size, width, height, threshold)
