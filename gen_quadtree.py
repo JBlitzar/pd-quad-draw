@@ -16,16 +16,16 @@ def is_uniform(img, x, y, size, threshold):
     return np.all(diff <= threshold)
 
 
-def quadtree(img, x, y, size, threshold):
-    if is_uniform(img, x, y, size, threshold) or size == 1:
+def quadtree(img, x, y, size, threshold, min_size=1):
+    if is_uniform(img, x, y, size, threshold) or size <= min_size:
         return [(x, y, size, average_color(img, x, y, size))]
     else:
         half = size // 2
         rects = []
-        rects.extend(quadtree(img, x, y, half, threshold))  # NW
-        rects.extend(quadtree(img, x + half, y, half, threshold))  # NE
-        rects.extend(quadtree(img, x, y + half, half, threshold))  # SW
-        rects.extend(quadtree(img, x + half, y + half, half, threshold))  # SE
+        rects.extend(quadtree(img, x, y, half, threshold, min_size))  # NW
+        rects.extend(quadtree(img, x + half, y, half, threshold, min_size))  # NE
+        rects.extend(quadtree(img, x, y + half, half, threshold, min_size))  # SW
+        rects.extend(quadtree(img, x + half, y + half, half, threshold, min_size))  # SE
         return rects
 
 
@@ -40,8 +40,8 @@ if __name__ == "__main__":
     width, height = img.size
     img_size = width
 
-    for threshold in range(200, 30, -10):
-        draw = quadtree(img_np, 0, 0, img_size, threshold)
+    for threshold in range(40, 30, -10):
+        draw = quadtree(img_np, 0, 0, img_size, threshold, min_size=16)
         draw = sorted(draw, key=lambda item: item[2], reverse=True)
         with open("pd-src/img.txt", "a") as f:
             for x, y, s, color in draw:

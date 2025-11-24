@@ -20,21 +20,21 @@ def draw_rect(x, y, size, color):
     draw.rectangle([x, y, x + size, y + size], fill=tuple(color))
 
 
-def quadtree(img, x, y, size, threshold):
-    if is_uniform(img, x, y, size, threshold) or size == 1:
+def quadtree(img, x, y, size, threshold, min_size=1):
+    if is_uniform(img, x, y, size, threshold) or size == min_size:
         draw_rect(x, y, size, average_color(img, x, y, size))
     else:
         half = size // 2
-        quadtree(img, x, y, half, threshold)  # NW
-        quadtree(img, x + half, y, half, threshold)  # NE
-        quadtree(img, x, y + half, half, threshold)  # SW
-        quadtree(img, x + half, y + half, half, threshold)  # SE
+        quadtree(img, x, y, half, threshold, min_size)  # NW
+        quadtree(img, x + half, y, half, threshold, min_size)  # NE
+        quadtree(img, x, y + half, half, threshold, min_size)  # SW
+        quadtree(img, x + half, y + half, half, threshold, min_size)  # SE
 
 
 if __name__ == "__main__":
     input_image_path = "image.png"
     output_image_path = "output_quadtree.png"
-    threshold = 15
+    threshold = 40
 
     img = Image.open(input_image_path).convert("RGB")
     img_np = np.array(img)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     output_img = Image.new("RGB", (size, size), (255, 255, 255))
     draw = ImageDraw.Draw(output_img)
 
-    quadtree(img_np, 0, 0, size, threshold)
+    quadtree(img_np, 0, 0, size, threshold, 16)
 
     output_img = output_img.crop((0, 0, width, height))
     output_img.save(output_image_path)
