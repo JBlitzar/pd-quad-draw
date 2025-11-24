@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "numpy",
+#     "pillow",
+# ]
+# ///
 from PIL import Image, ImageDraw
 import numpy as np
 
