@@ -5,6 +5,14 @@ from adafruit_hid.keyboard import Keyboard  # type: ignore
 from adafruit_hid.keycode import Keycode  # type: ignore
 from adafruit_hid.mouse_abs import Mouse  # type: ignore
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS  # type: ignore
+import board  # type: ignore
+import digitalio  # type: ignore
+
+
+BUTTON_PIN = board.GP11
+button = digitalio.DigitalInOut(BUTTON_PIN)
+button.switch_to_input(pull=digitalio.Pull.UP)
+
 
 WIDTH = 1728
 HEIGHT = 1117
@@ -104,6 +112,10 @@ def draw_rect(x, y, size, color):
     time.sleep(0.01)
 
 
+while True:
+    if not button.value:  # Button pressed
+        break
+    time.sleep(0.05)
 setup()
 
 with open("img.txt", "r") as f:
